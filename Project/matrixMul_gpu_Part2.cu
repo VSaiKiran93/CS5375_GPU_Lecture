@@ -17,18 +17,17 @@
 
 // ------------------------------------------------------------------ GPUmatmul
 //Implemented threads by using stride 
+
 __global__
 void GPUmatmul(int N, double *x, double *y, double *ans)
 {
-int indexx=threadIdx.x;
-int indexy=threadIdx.y;
-int stridex= blockDim.x;
-int stridey= blockDim.y;
-for (int i= indexx; i <N; i+=stridex)
-{
-   for (int j= indexy;j<N;j+=stridey)
-    {  for (int k=0;k<N;k++)
-        {
+int index.x=threadIdx.x;  // initializinf the threads by using strides 
+int index.y=threadIdx.y;
+int stride.x= blockDim.x;
+int stride.y= blockDim.y;
+for (int i= index.x; i <N; i+=stride.x){
+   for (int j= indexy;j<N;j+=stride.y){  
+      for (int k=0;k<N;k++){
             ans[i*N+j]+=(x[i*N+k]*y[k*N+j]);
         }
     }
@@ -40,7 +39,7 @@ for (int i= indexx; i <N; i+=stridex)
 // ---------------------------------------------------------------------- check
 bool check(int N, double *ans)
 {
-                                                           for(int i = 0; i < N; i++) {
+   for(int i = 0; i < N; i++) {
     for(int j = 0; j < N; j++) {
       if(ans[i*N+j] != 20.0) return false;
     }
@@ -63,7 +62,9 @@ int main(void)
   cudaMallocManaged(&x,sizeof(double)*N*N);
   cudaMallocManaged(&y,sizeof(double)*N*N);
   cudaMallocManaged(&ans,sizeof(double)*N*N);
-    // ..........................................................................
+   
+   
+  // ..........................................................................
   // initialize x,y and ans arrays on the host
   for (int i = 0; i < N; i++) {
     for(int j = 0; j < N; j++) {
