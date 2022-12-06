@@ -21,12 +21,12 @@
 __global__
 void GPUmatmul(int N, double *x, double *y, double *ans)
 {
-int index.x=threadIdx.x;  // initializinf the threads by using strides 
-int index.y=threadIdx.y;
-int stride.x= blockDim.x;
-int stride.y= blockDim.y;
-for (int i= index.x; i <N; i+=stride.x){
-   for (int j= index.y;j<N;j+=stride.y){  
+int index_x=threadIdx.x;  // initializinf the threads by using strides 
+int index_y=threadIdx.y;
+int stride_x= blockDim.x;
+int stride_y= blockDim.y;
+for (int i= index_x; i <N; i+=stride_x){
+   for (int j= index_y; j<N; j+=stride_y){  
       for (int k=0;k<N;k++){
             ans[i*N+j]+=(x[i*N+k]*y[k*N+j]);
         }
