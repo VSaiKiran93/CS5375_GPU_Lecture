@@ -67,23 +67,23 @@ int main(void)
   cudaMallocManaged((void **)&ans, sizeof(float) * N * N);
 
   
-  // Prefetch the memory
+  // Prefetch the memory from device
   int device = -1;
-  cudaMemPrefetchAsync(x, sizeof(float) * N * N, device, NULL);
-  cudaMemPrefetchAsync(y, sizeof(float) * N * N, device, NULL);
-  cudaMemPrefetchAsync(ans, sizeof(float) * N * N, device, NULL);
-  for (int i = 0; i < N; i++)
-  {
-    for (int j = 0; j < N; j++)
-    {
+  cudaMemPrefetchAsync(x, sizeof(float)*N*N, device, NULL);
+  cudaMemPrefetchAsync(y, sizeof(float)*N*N, device, NULL);
+  cudaMemPrefetchAsync(ans, sizeof(float)*N*N, device, NULL);
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
       x[i * N + j] = 5;
       y[i * N + j] = (i == j ? 1 : 0);
       ans[i * N + j] = (double)0.000000000000;
     }
   }
-
+  
+ // initialize blocksize and grid size 
   int blockSize = 16; // 16*16 = 256
   int gridSize = (int)ceil(N / blockSize);
+  
   // ..........................................................................
   double avg = 0;
   std::cout << "Starting optimized GPU computation" << std::endl;
