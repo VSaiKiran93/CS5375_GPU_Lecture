@@ -17,13 +17,14 @@
 
 // ------------------------------------------------------------------ GPUmatmul
 __global__
-void GPUmatmul(int N, double *x, double *y, double *ans)
-{  int indexx = blockIdx.x * blockDim.x + threadIdx.x;
-  int stridex = blockDim.x * gridDim.x;
-    int indexy = blockIdx.y * blockDim.y + threadIdx.y;
-  int stridey = blockDim.y * gridDim.y;
-  for(int i = indexx; i < N; i+=stridex) {
-    for(int j = indexy; j < N; j+=stridey) {
+void GPUmatmul(int N, double *x, double *y, double *ans){  
+int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+int index_y = blockIdx.y * blockDim.y + threadIdx.y;
+int stride_x = blockDim.x * gridDim.x;
+int stride_y = blockDim.y * gridDim.y;
+	
+  for(int i = index_x; i < N; i+=stride_x) {
+    for(int j = index_y; j < N; j+=stride_y) {
       for(int k = 0; k < N; k++) {
         ans[i*N+j] += (x[i*N+k] * y[k*N+j]);
       }
@@ -55,7 +56,10 @@ int main(void)
 
   // Martices
   double *x, *y, *ans;
-
+  
+ // Allocate Unified Memory - accessible from both CPU and GPU 
+ //...
+ //...
   cudaMallocManaged(&x,sizeof(double)*N*N);
   cudaMallocManaged(&y,sizeof(double)*N*N);
   cudaMallocManaged(&ans,sizeof(double)*N*N);
@@ -65,7 +69,7 @@ int main(void)
   // initialize x,y and ans arrays on the host
   for (int i = 0; i < N; i++) {
     for(int j = 0; j < N; j++) {
-	   x[i*N+j] = 5;
+      x[i*N+j] = 5;
       y[i*N+j] = (i==j?1:0);
       ans[i*N+j] = (double)0.000000000000;
     }
@@ -77,15 +81,19 @@ int main(void)
   // Run kernel on GPU
   for(int i = 0; i <= iter; i++) {
     t = clock();
+    // Update the Kernel code to consider the entire grid of thread blocks 
     int blockSize=256;
-    int numBlocks=(N+blockSize-1)/blockSize;
-    GPUmatmul<<<numBlocks,blockSize>>>(N, x, y,ans);
+    int B = (N+blockSize-1)/blockSize;  // B is total number of blocks 
+    GPUmatmul<<<B, blockSize>>>(N, x, y,ans);
+	  
+    // Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
     t = clock() - t;
     if(i) avg += t; //we will ignore the first run
     // printf ("It took GPU-%d %f ms.\n",i,(((double)t)/CLOCKS_PER_SEC)*1000);
   }
-    avg /= iter;
+   
+  avg /= iter;
   avg /= CLOCKS_PER_SEC;
   avg *= 1000;
   printf("It took %lf ms on avg.\n", avg);
