@@ -80,7 +80,9 @@ int main(void)
   // Run kernel on GPU
   for(int i = 0; i <= iter; i++) {
     t = clock();
-    GPUmatmul<<<1,256>>>(N, x, y,ans);   //Changed threads to 256
+     
+    //Run Kernel on 33M elements on the GPU
+    GPUmatmul<<<1, 256>>>(N, x, y,ans);   //Changed threads to 256
     cudaDeviceSynchronize();
     t = clock() - t;
     if(i) avg += t; //we will ignore the first run
