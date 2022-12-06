@@ -18,15 +18,15 @@
 __global__ void GPUmatmul(int N, double *x, double *y, double *ans)
 {
   // Compute each thread's global row and column index
-  int row = blockIdx.y * blockDim.y + threadIdx.y;
-  int col = blockIdx.x * blockDim.x + threadIdx.x;
+  int row = blockIdx.y * blockDim.y + threadIdx.y;  // row 
+  int column = blockIdx.x * blockDim.x + threadIdx.x;  // column
 
   // Iterate over row, and down column
-  ans[row * N + col] = 0;
+  ans[row * N + column] = 0;
   for (int k = 0; k < N; k++)
   {
     // Accumulate results for a single element
-    ans[row * N + col] += x[row * N + k] * y[k * N + col];
+    ans[row * N + column] += x[row * N + k] * y[k * N + column];
   }
 }
 
@@ -60,13 +60,14 @@ int main(void)
   // ...
   // ...
   // ...
-
   // ..........................................................................
   // initialize x,y and ans arrays on the host
   cudaMallocManaged((void **)&x, sizeof(float) * N * N);
   cudaMallocManaged((void **)&y, sizeof(float) * N * N);
   cudaMallocManaged((void **)&ans, sizeof(float) * N * N);
 
+  
+  // Prefetch the memory
   int device = -1;
   cudaMemPrefetchAsync(x, sizeof(float) * N * N, device, NULL);
   cudaMemPrefetchAsync(y, sizeof(float) * N * N, device, NULL);
@@ -94,6 +95,7 @@ int main(void)
   {
     t = clock();
     GPUmatmul<<<grid, threads>>>(N, x, y, ans);
+    //Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
     t = clock() - t;
     if (i)
