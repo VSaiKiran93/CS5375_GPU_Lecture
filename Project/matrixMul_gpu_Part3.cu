@@ -4,7 +4,7 @@
 #include <iostream>
 
 __global__
-void MM(double *x, double *y, double *ans, int N) 
+void GPUmatmul(double *x, double *y, double *ans, int N) 
 {
   //calculates the unique thread ID in the block
 	int t= (blockDim.x*blockDim.y)*threadIdx.z+(threadIdx.y*blockDim.x)+(threadIdx.x);
@@ -44,8 +44,10 @@ int main(int argc, char const *argv[])
     int iter = 3;
     clock_t t;
 
-    // allocate memory in host RAM
+    // matrices
     double *x, *y, *ans;
+	
+    //allocate memory -- accessible from both GPU and CPU
     cudaMallocManaged((void **) &x, N*N*sizeof(double));
     cudaMallocManaged((void **) &y, N*N*sizeof(double));
     cudaMallocManaged((void **) &ans, N*N*sizeof(double));
@@ -59,12 +61,12 @@ int main(int argc, char const *argv[])
         }
     }
     
-    // Launch kernel
+    // Run the kernel
     double avg = 0;
     std::cout<<"Starting GPU computation"<<std::endl;
     for(int i = 0; i <= iter; i++) {
         t = clock();
-        MM<<<dim3(16,4,4), dim3(8,8,8)>>>(x, y, ans, N);
+        GPUmatmul<<<dim3(16,4,4), dim3(8,8,8)>>>(x, y, ans, N);
         t = clock() - t;
         if(i) avg += t;
     }
