@@ -19,9 +19,8 @@
 //Implemented threads by using stride 
 
 __global__
-void GPUmatmul(int N, double *x, double *y, double *ans)
-{
-int index_x=threadIdx.x;  // initializinf the threads by using strides 
+void GPUmatmul(int N, double *x, double *y, double *ans){
+int index_x=threadIdx.x;  // initializing the threads by using strides 
 int index_y=threadIdx.y;
 int stride_x= blockDim.x;
 int stride_y= blockDim.y;
@@ -100,10 +99,12 @@ int main(void)
 
   // Free memory
   // ...
-
+  // ...
   cudaFree(x);
   cudaFree(y);
   cudaFree(ans);
-  return 0;
+  
+   
+   return 0;
 }
 /* EOF */
