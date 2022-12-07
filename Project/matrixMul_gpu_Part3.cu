@@ -105,11 +105,11 @@ int main(void)
   // TODO: Free memory
   // ...
   // ...
-  // ...
-
   cudaFree(x);
   cudaFree(y);
   cudaFree(ans);
+	
+	
   return 0;
 }
 /* EOF */
