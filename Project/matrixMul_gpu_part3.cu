@@ -17,13 +17,13 @@
 
 // ------------------------------------------------------------------ GPUmatmul
 __global__
-void GPUmatmul(int N, double *x, double *y, double *ans)
-{  int indexx = blockIdx.x * blockDim.x + threadIdx.x;
-  int stridex = blockDim.x * gridDim.x;
-    int indexy = blockIdx.y * blockDim.y + threadIdx.y;
-  int stridey = blockDim.y * gridDim.y;
-  for(int i = indexx; i < N; i+=stridex) {
-    for(int j = indexy; j < N; j+=stridey) {
+void GPUmatmul(int N, double *x, double *y, double *ans){
+  int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride_x = blockDim.x * gridDim.x;
+  int index_y = blockIdx.y * blockDim.y + threadIdx.y;
+  int stride_y = blockDim.y * gridDim.y;
+  for(int i = index_x; i < N; i+=stride_x) {
+    for(int j = index_y; j < N; j+=stride_y) {
       for(int k = 0; k < N; k++) {
         ans[i*N+j] += (x[i*N+k] * y[k*N+j]);
       }
@@ -56,9 +56,9 @@ int main(void)
   // Martices
   double *x, *y, *ans;
 
-  cudaMallocManaged(&x,sizeof(double)*N*N);
-  cudaMallocManaged(&y,sizeof(double)*N*N);
-  cudaMallocManaged(&ans,sizeof(double)*N*N);
+  cudaMallocManaged(&x, N*N*sizeof(double));
+  cudaMallocManaged(&y,N*N*sizeof(double));
+  cudaMallocManaged(&ans, N*N*sizeof(double));
 
 
   // ..........................................................................
@@ -98,10 +98,10 @@ int main(void)
   // ...
   // ...
   // ...
-
   cudaFree(x);
   cudaFree(y);
   cudaFree(ans);
+	
   return 0;
 }
 /* EOF */
