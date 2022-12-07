@@ -87,7 +87,7 @@ int main(void)
     GPUmatmul<<<B, blockSize>>>(N, x, y,ans);
 	  
     // Wait for GPU to finish before accessing on host
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     t = clock() - t;
     if(i) avg += t; //we will ignore the first run
     // printf ("It took GPU-%d %f ms.\n",i,(((double)t)/CLOCKS_PER_SEC)*1000);
@@ -97,6 +97,9 @@ int main(void)
   avg /= CLOCKS_PER_SEC;
   avg *= 1000;
   printf("It took %lf ms on avg.\n", avg);
+  cudaThreadSynchronize(); 
+	
+   //validate the computed results 
   if(check(N,ans)) std::cout<<"RUN OK."<<std::endl;
   else std::cout<<"RUN NOT OK."<<std::endl;
 
