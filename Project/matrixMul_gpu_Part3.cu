@@ -17,14 +17,22 @@
 
 // ------------------------------------------------------------------ GPUmatmul
 __global__
-void GPUmatmul(int N, double *x, double *y, double *ans){  
-int index_x = blockIdx.x * blockDim.x + threadIdx.x;
-int index_y = blockIdx.y * blockDim.y + threadIdx.y;
-int stride_x = blockDim.x * gridDim.x;
-int stride_y = blockDim.y * gridDim.y;
-	
-  for(int i = index_x; i < N; i+=stride_x) {
-    for(int j = index_y; j < N; j+=stride_y) {
+//void GPUmatmul(int N, double *x, double *y, double *ans){  
+//int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+//int index_y = blockIdx.y * blockDim.y + threadIdx.y;
+//int stride_x = blockDim.x * gridDim.x;
+//int stride_y = blockDim.y * gridDim.y;
+  //calculates the unique thread ID in the block
+	int t= (blockDim.x*blockDim.y)*threadIdx.z+(threadIdx.y*blockDim.x)+(threadIdx.x);
+	//calculates the unique block ID in the grid
+	int b= (gridDim.x*gridDim.y)*blockIdx.z+(blockIdx.y*gridDim.x)+(blockIdx.x);
+	//block size 
+	int T= blockDim.x*blockDim.y*blockDim.z;
+	//grid size
+	int B= gridDim.x*gridDim.y*gridDim.z;
+	 	
+  for(int i = b; i < N; i+=B) {
+    for(int j = t; j < N; j+=T) {
       for(int k = 0; k < N; k++) {
         ans[i*N+j] += (x[i*N+k] * y[k*N+j]);
       }
