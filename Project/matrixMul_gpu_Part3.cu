@@ -82,7 +82,7 @@ int main(void)
     int blockSize=256;
     // calculation of number of blocks
     int B =(N+blockSize-1)/blockSize;
-    GPUmatmul<<< B,blockSize>>>(N, x, y,ans);
+    GPUmatmul<<<B,blockSize>>>(N, x, y,ans);
     cudaDeviceSynchronize();
     t = clock() - t;
     if(i) avg += t; //we will ignore the first run
