@@ -1,7 +1,7 @@
 all: 
-	cpu GPU_Part1 GPU_Part2 GPU_Part3 GPU_Part4
+	cpu_exe GPU_Part1 GPU_Part2 GPU_Part3 GPU_Part4
 
-cpu:
+cpu_exe:
 	g++ matrixMul_cpu.cpp -o matrixMul_cpu.exe
 GPU_Part1:
 	nvcc matrix_Mul_gpu_part1.cu -o matrix_Mul_gpu_part1.exe
