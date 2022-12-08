@@ -18,6 +18,7 @@
 // ------------------------------------------------------------------ GPUmatmul
 __global__
 void GPUmatmul(int N, double *x, double *y, double *ans){
+  // initialization
   int index_x = blockIdx.x * blockDim.x + threadIdx.x;
   int stride_x = blockDim.x * gridDim.x;
   int index_y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -77,9 +78,11 @@ int main(void)
   // Run kernel on GPU
   for(int i = 0; i <= iter; i++) {
     t = clock();
+	  
     int blockSize=256;
-    int numBlocks=(N+blockSize-1)/blockSize;
-    GPUmatmul<<<numBlocks,blockSize>>>(N, x, y,ans);
+    // calculation of number of blocks
+    int B =(N+blockSize-1)/blockSize;
+    GPUmatmul<<< B,blockSize>>>(N, x, y,ans);
     cudaDeviceSynchronize();
     t = clock() - t;
     if(i) avg += t; //we will ignore the first run
